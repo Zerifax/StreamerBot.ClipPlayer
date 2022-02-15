@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zerifax.ClipHelper", "Zerifax.ClipHelper\Zerifax.ClipHelper.csproj", "{6595DCB4-6CFB-4241-90D1-1427D79815A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zerifax.ClipHelper.Tests", "Zerifax.ClipHelper.Tests\Zerifax.ClipHelper.Tests.csproj", "{21E55AB8-A4AB-4C29-A2C8-754D9ECD466F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zerifax.ClipHelper.Actions", "Zerifax.ClipHelper.Actions\Zerifax.ClipHelper.Actions.csproj", "{06372804-DFCF-4390-99EF-90B227CC481C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{65B14E13-9BC3-400C-AEB1-7EFD3E876702}"
+ProjectSection(SolutionItems) = preProject
+	readme.md = readme.md
+EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6595DCB4-6CFB-4241-90D1-1427D79815A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6595DCB4-6CFB-4241-90D1-1427D79815A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6595DCB4-6CFB-4241-90D1-1427D79815A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6595DCB4-6CFB-4241-90D1-1427D79815A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21E55AB8-A4AB-4C29-A2C8-754D9ECD466F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21E55AB8-A4AB-4C29-A2C8-754D9ECD466F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21E55AB8-A4AB-4C29-A2C8-754D9ECD466F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21E55AB8-A4AB-4C29-A2C8-754D9ECD466F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06372804-DFCF-4390-99EF-90B227CC481C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06372804-DFCF-4390-99EF-90B227CC481C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06372804-DFCF-4390-99EF-90B227CC481C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06372804-DFCF-4390-99EF-90B227CC481C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
