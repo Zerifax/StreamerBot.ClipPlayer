@@ -65,7 +65,7 @@
             videoPlayerFile += "&thumbnail_url=" + clipPreview;
             int delay = 700 + (int) clipData.DurationSeconds * 1000;
             videoPlayerFile += "&time=" + (delay*1000);
-            videoPlayerFile += "&websocket=" + webSocket;
+            videoPlayerFile += "&ws=" + webSocket;
 
             CPH.ObsSetBrowserSource(scene, source, videoPlayerFile);
 

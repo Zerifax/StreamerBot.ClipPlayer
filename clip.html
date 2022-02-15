@@ -1,220 +1,222 @@
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
-<style>
-body {
-	margin: 0;
-	padding: 0;
-	background: black;
-}
-
-h2 {
-	font-family: 'Berlin Sans FB';
-	font-weight: normal;
-	color: white;
-	font-size: 48px;
-	margin: 6;
-	text-shadow: -1px -1px 8px white;
-	opacity: 0.99;
-	padding-top: 100px;
-}
-
-.container {
-	display: flex;
-	position: absolute;
-	left: 0px; 
-	top: 0px; 
-	width: 100%;
-	height: 100%;
-	justify-content: center;
-  	align-items: center;
-}
-
-.videoContainer {
-	z-index:10;
-}
-
-.profileImage {
-	display: inline-block;
-	position: absolute; 
-	max-height: 300px; 
-	max-width:300px; 
-	width: 100%;
-	height: 100%;
-	text-align: center; 
-	z-index: 1
-}
-
-.profileImage > span {
-	display: inline-block;
-	width: 100%;
-	height: 100%;
-	background-repeat: no-repeat;
-	background-size: contain;
-	background-position: center;
-}
-
-.progress {
-	position: absolute;
-	background-color: rgba(255, 0, 0, 0.7);
-	display: block;
-	left: 0px;
-	height: 8px;
-	z-index: 20;
-	transform: translate(0, -8px);
-}
-
-</style>
-<title>Streamer.bot clip player</title>
- 
-<script>
-
-	function videoViewModel() {
-		var self = this;
-		const skipTime = 5.0;
-
-		this.init = function(sourceDoc, params) {
-			self.ws = null;
-			self.autoStop = true;
-
-			const urlParams = new URLSearchParams(params);
-
-			self.video = urlParams.get('video');
-			self.time = parseFloat(urlParams.get('time'));
-			self.image = urlParams.get('image');
-			self.user = urlParams.get('user');
-			self.thumbnailUrl = urlParams.get('thumbnail_url');
-			self.wsUrl = urlParams.get('ws');
-
-			// multi purpose - we can extract a video url from the thumbnail or play a video directly
-			if (self.thumbnailUrl != null && self.thumbnailUrl.length > 0) {
-				self.videoSrc = thumbnailUrl.replace(/(.*)-preview-.*/, '$1.mp4');
-			} else {
-				self.videoSrc = self.video;
-			}
-
-			self.videoElement = sourceDoc.getElementById('videoplayer');
-			self.progressElement = sourceDoc.getElementById('progress');
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			background: black;
 		}
 
-		this.wsMessage = function(evt) {
-			// media controls from websocket messages
-			switch (evt.data) {
-				case "play":
-					if (self.videoElement.paused) {
-						self.videoElement.play();
-					} else {
-						self.videoElement.pause();
-					}
+		h2 {
+			font-family: 'Berlin Sans FB';
+			font-weight: normal;
+			color: white;
+			font-size: 48px;
+			margin: 6;
+			text-shadow: -1px -1px 8px white;
+			opacity: 0.99;
+			padding-top: 100px;
+		}
 
-					self.autoStop = false;
-					break;
+		.container {
+			display: flex;
+			position: absolute;
+			left: 0px;
+			top: 0px;
+			width: 100%;
+			height: 100%;
+			justify-content: center;
+			align-items: center;
+		}
 
-				case "<":
-					if (self.videoElement.currentTime > skipTime) {
-						self.videoElement.currentTime -= skipTime;
-					} else {
+		.videoContainer {
+			z-index: 10;
+		}
+
+		.profileImage {
+			display: inline-block;
+			position: absolute;
+			max-height: 300px;
+			max-width: 300px;
+			width: 100%;
+			height: 100%;
+			text-align: center;
+			z-index: 1
+		}
+
+		.profileImage > span {
+			display: inline-block;
+			width: 100%;
+			height: 100%;
+			background-repeat: no-repeat;
+			background-size: contain;
+			background-position: center;
+		}
+
+		.progress {
+			position: absolute;
+			background-color: rgba(255, 0, 0, 0.7);
+			display: block;
+			left: 0px;
+			height: 8px;
+			z-index: 20;
+			transform: translate(0, -8px);
+		}
+
+	</style>
+	<title>Streamer.bot clip player</title>
+
+	<script>
+
+		function videoViewModel() {
+			var self = this;
+			const skipTime = 5.0;
+
+			this.init = function (sourceDoc, params) {
+				self.ws = null;
+				self.autoStop = true;
+
+				const urlParams = new URLSearchParams(params);
+
+				self.video = urlParams.get('video');
+				self.time = parseFloat(urlParams.get('time'));
+				self.image = urlParams.get('image');
+				self.user = urlParams.get('user');
+				self.thumbnailUrl = urlParams.get('thumbnail_url');
+				self.wsUrl = urlParams.get('ws');
+
+				// multi purpose - we can extract a video url from the thumbnail or play a video directly
+				if (self.thumbnailUrl != null && self.thumbnailUrl.length > 0) {
+					self.videoSrc = self.thumbnailUrl.replace(/(.*)-preview-.*/, '$1.mp4');
+				} else {
+					self.videoSrc = self.video;
+				}
+
+				self.videoElement = sourceDoc.getElementById('videoplayer');
+				self.progressElement = sourceDoc.getElementById('progress');
+			}
+
+			this.wsMessage = function (evt) {
+				// media controls from websocket messages
+				switch (evt.data) {
+					case "play":
+						if (self.videoElement.paused) {
+							self.videoElement.play();
+						} else {
+							self.videoElement.pause();
+						}
+
+						self.autoStop = false;
+						break;
+
+					case "<":
+						if (self.videoElement.currentTime > skipTime) {
+							self.videoElement.currentTime -= skipTime;
+						} else {
+							self.videoElement.currentTime = 0;
+						}
+
+						self.autoStop = false;
+						break;
+
+					case "<<":
 						self.videoElement.currentTime = 0;
-					}
-					
-					self.autoStop = false;
-					break;
+						self.autoStop = false;
+						break;
 
-				case "<<":
-					self.videoElement.currentTime = 0;
-					self.autoStop = false;
-					break;
+					case ">":
+						if (self.videoElement.currentTime < (self.time - skipTime)) {
+							self.videoElement.currentTime += skipTime;
+						}
 
-				case ">":
-					if (self.videoElement.currentTime < (self.time - skipTime)) {
-						self.videoElement.currentTime += skipTime;
-					}
-
-					self.autoStop = false;
-					break;
-			}
-		}
-
-		this.connectWebsocket = function() {	
-			if (self.wsUrl != null && self.wsUrl.length > 0) {
-				self.ws = new WebSocket(self.wsUrl);
-				
-				self.ws.onopen = function() {
-					self.ws.onmessage = self.wsMessage;
+						self.autoStop = false;
+						break;
 				}
 			}
-		}
 
-		this.updateProgress = function() {
-			self.progressElement.style.width = (self.videoElement.currentTime / self.time * 100) + "%";
-		}
+			this.connectWebsocket = function () {
+				if (self.wsUrl != null && self.wsUrl.length > 0) {
+					self.ws = new WebSocket(self.wsUrl);
 
-		this.showVideo = function() {
-			if (self.videoSrc == null || self.videoSrc.length == 0) {
-				return;
-			}
-
-			if (!self.videoElement.onplay) {
-				self.videoElement.onplay = function() {
-					if (self.videoElement.duration) {
-						self.time = self.videoElement.duration
+					self.ws.onopen = function () {
+						self.ws.onmessage = self.wsMessage;
 					}
 				}
-
-				self.videoElement.ontimeupdate = self.updateProgress;
 			}
-			
-			self.videoElement.src = self.videoSrc;			
+
+			this.updateProgress = function () {
+				self.progressElement.style.width = (self.videoElement.currentTime / self.time * 100) + "%";
+			}
+
+			this.showVideo = function () {
+				if (self.videoSrc == null || self.videoSrc.length == 0) {
+					return;
+				}
+
+				if (!self.videoElement.onplay) {
+					self.videoElement.onplay = function () {
+						if (self.videoElement.duration) {
+							self.time = self.videoElement.duration
+						}
+					}
+
+					self.videoElement.ontimeupdate = self.updateProgress;
+				}
+
+				self.videoElement.src = self.videoSrc;
+			}
+
+			this.playVideo = function () {
+				let firstrun = true;
+
+				// apply mp4 to video element so it's ready to play
+
+				if (self.image != null && self.image.length > 0) {
+					document.getElementById('imagebox2').innerHTML = "<span style='background-image: url(\"" + self.image + "\")' />";
+				} else {
+					document.getElementById('imagebox2').innerHTML = "<h2>" + self.user + "</h2>";
+				}
+
+				setTimeout(self.showVideo, 1000);
+			}
+
+			this.cleanup = function () {
+				document.getElementById('videocontainer').innerHTML = "";
+				document.getElementById('imagebox2').innerHTML = "<span style='background-image: url(\"" + self.image + "\")' />";
+
+				if (self.ws != null && self.ws.OPEN) {
+					self.ws.send('stopped');
+				}
+			}
+
+			this.onEnded = function () {
+				if (self.autoStop) {
+					setTimeout(self.cleanup, 500);
+				}
+			}
+		};
+
+		const videoVM = new videoViewModel();
+
+		function onLoad() {
+			videoVM.init(document, window.location.search);
+			videoVM.connectWebsocket();
+			videoVM.playVideo();
 		}
 
-		this.playVideo = function() {
-			let firstrun = true;			
-
-			// apply mp4 to video element so it's ready to play
-
-			if (self.image != null && self.image.length > 0) {
-				document.getElementById('imagebox2').innerHTML="<span style='background-image: url(\""+ self.image+ "\")' />";
-			}
-			else {
-				document.getElementById('imagebox2').innerHTML="<h2>" + self.user + "</h2>";
-			}
-
-			setTimeout(self.showVideo,1000);
-		}
-
-		this.cleanup = function() {
-			document.getElementById('videocontainer').innerHTML="";
-			document.getElementById('imagebox2').innerHTML="<span style='background-image: url(\""+ self.image+ "\")' />";
-
-			if (self.ws != null && self.ws.OPEN) {
-				self.ws.send('stopped');
-			}
-		}
-
-		this.onEnded = function () {
-			if (self.autoStop) {
-				setTimeout(self.cleanup,500);
-			}
-		}
-	};
-
-	const videoVM = new videoViewModel();
-
-	function onLoad() {
-		videoVM.init(document, window.location.search);
-		videoVM.connectWebsocket();
-		videoVM.playVideo();
-	}
-
-</script>
+	</script>
 
 </head>
-<body onload="onLoad()">
+<body onLoad="onLoad()">
 
-	<div class="container">
-		<div id="videocontainer" class="videoContainer" text-align:="" center="">
-			<video id="videoplayer" style="width:100%" autoplay="" onended="videoVM.onEnded()"></video>
-			<div id="progress" class="progress"></div>
-		</div>
-		<div id="imagebox2" class="profileImage"><h2>Loading...</h2></div>
+<div className="container">
+	<div id="videocontainer" className="videoContainer">
+		<video id="videoplayer" style="width:100%" autoPlay="" onEnded="videoVM.onEnded()"></video>
+		<div id="progress" className="progress"></div>
 	</div>
+	<div id="imagebox2" className="profileImage"><h2>Loading...</h2></div>
+</div>
 
-</body></html>
+</body>
+</html>
