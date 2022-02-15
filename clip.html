@@ -1,221 +1,230 @@
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
-	<style>
-		body {
-			margin: 0;
-			padding: 0;
-			background: black;
-		}
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: black;
+        }
 
-		h2 {
-			font-family: 'Berlin Sans FB';
-			font-weight: normal;
-			color: white;
-			font-size: 48px;
-			margin: 6;
-			text-shadow: -1px -1px 8px white;
-			opacity: 0.99;
-			padding-top: 100px;
-		}
+        h2 {
+            font-family: 'Berlin Sans FB';
+            font-weight: normal;
+            color: white;
+            font-size: 48px;
+            margin: 6;
+            text-shadow: -1px -1px 8px white;
+            opacity: 0.99;
+            padding-top: 100px;
+        }
 
-		.container {
-			display: flex;
-			position: absolute;
-			left: 0px;
-			top: 0px;
-			width: 100%;
-			height: 100%;
-			justify-content: center;
-			align-items: center;
-		}
+        .container {
+            display: flex;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+        }
 
-		.videoContainer {
-			z-index: 10;
-		}
+        .videoContainer {
+            z-index: 10;
+            width: 100%;
+        }
 
-		.profileImage {
-			display: inline-block;
-			position: absolute;
-			max-height: 300px;
-			max-width: 300px;
-			width: 100%;
-			height: 100%;
-			text-align: center;
-			z-index: 1
-		}
+        .profileImage {
+            display: inline-block;
+            position: absolute;
+            max-height: 300px;
+            max-width: 300px;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            z-index: 1
+        }
 
-		.profileImage > span {
-			display: inline-block;
-			width: 100%;
-			height: 100%;
-			background-repeat: no-repeat;
-			background-size: contain;
-			background-position: center;
-		}
+        .profileImage > span {
+            display: inline-block;
+            width: 100%;
+            height: 100%;
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-position: center;
+        }
 
-		.progress {
-			position: absolute;
-			background-color: rgba(255, 0, 0, 0.7);
-			display: block;
-			left: 0px;
-			height: 8px;
-			z-index: 20;
-			transform: translate(0, -8px);
-		}
+        .progress {
+            position: absolute;
+            background-color: rgba(255, 0, 0, 0.7);
+            display: block;
+            left: 0px;
+            height: 8px;
+            z-index: 20;
+            transform: translate(0, -8px);
+        }
 
-	</style>
-	<title>Streamer.bot clip player</title>
+    </style>
+    <title>Streamer.bot clip player</title>
 
-	<script>
+    <script>
 
-		function videoViewModel() {
-			var self = this;
-			const skipTime = 5.0;
+        function videoViewModel() {
+            var self = this;
+            const skipTime = 5.0;
 
-			this.init = function (sourceDoc, params) {
-				self.ws = null;
-				self.autoStop = true;
+            this.init = function (sourceDoc, params) {
+                self.ws = null;
+                self.autoStop = true;
 
-				const urlParams = new URLSearchParams(params);
+                const urlParams = new URLSearchParams(params);
 
-				self.video = urlParams.get('video');
-				self.time = parseFloat(urlParams.get('time'));
-				self.image = urlParams.get('image');
-				self.user = urlParams.get('user');
-				self.thumbnailUrl = urlParams.get('thumbnail_url');
-				self.wsUrl = urlParams.get('ws');
+                self.video = urlParams.get('video');
+                self.time = parseFloat(urlParams.get('time'));
+                self.image = urlParams.get('image');
+                self.user = urlParams.get('user');
+                self.thumbnailUrl = urlParams.get('thumbnail_url');
+                self.wsUrl = urlParams.get('ws');
 
-				// multi purpose - we can extract a video url from the thumbnail or play a video directly
-				if (self.thumbnailUrl != null && self.thumbnailUrl.length > 0) {
-					self.videoSrc = self.thumbnailUrl.replace(/(.*)-preview-.*/, '$1.mp4');
-				} else {
-					self.videoSrc = self.video;
-				}
+                // multi purpose - we can extract a video url from the thumbnail or play a video directly
+                if (self.thumbnailUrl != null && self.thumbnailUrl.length > 0) {
+                    self.videoSrc = self.thumbnailUrl.replace(/(.*)-preview-.*/, '$1.mp4');
+                } else {
+                    self.videoSrc = self.video;
+                }
 
-				self.videoElement = sourceDoc.getElementById('videoplayer');
-				self.progressElement = sourceDoc.getElementById('progress');
-			}
+                self.videoElement = sourceDoc.getElementById('videoplayer');
+                self.progressElement = sourceDoc.getElementById('progress');
+            }
 
-			this.wsMessage = function (evt) {
-				// media controls from websocket messages
-				switch (evt.data) {
-					case "play":
-						if (self.videoElement.paused) {
-							self.videoElement.play();
-						} else {
-							self.videoElement.pause();
-						}
+            this.wsMessage = function (evt) {
+                // media controls from websocket messages
+                switch (evt.data) {
+                    case "play":
+                        if (self.videoElement.paused) {
+                            self.videoElement.play();
+                        } else {
+                            self.videoElement.pause();
+                        }
 
-						self.autoStop = false;
-						break;
+                        self.autoStop = false;
+                        break;
 
-					case "<":
-						if (self.videoElement.currentTime > skipTime) {
-							self.videoElement.currentTime -= skipTime;
-						} else {
-							self.videoElement.currentTime = 0;
-						}
+                    case "stop":
+                        if (!self.videoElement.paused) {
+                            self.videoElement.pause();
+                        }
 
-						self.autoStop = false;
-						break;
+                        self.autoStop = false;
+                        break;
 
-					case "<<":
-						self.videoElement.currentTime = 0;
-						self.autoStop = false;
-						break;
+                    case "<":
+                        if (self.videoElement.currentTime > skipTime) {
+                            self.videoElement.currentTime -= skipTime;
+                        } else {
+                            self.videoElement.currentTime = 0;
+                        }
 
-					case ">":
-						if (self.videoElement.currentTime < (self.time - skipTime)) {
-							self.videoElement.currentTime += skipTime;
-						}
+                        self.autoStop = false;
+                        break;
 
-						self.autoStop = false;
-						break;
-				}
-			}
+                    case "<<":
+                        self.videoElement.currentTime = 0;
+                        self.autoStop = false;
+                        break;
 
-			this.connectWebsocket = function () {
-				if (self.wsUrl != null && self.wsUrl.length > 0) {
-					self.ws = new WebSocket(self.wsUrl);
+                    case ">":
+                        if (self.videoElement.currentTime < (self.time - skipTime)) {
+                            self.videoElement.currentTime += skipTime;
+                        }
 
-					self.ws.onopen = function () {
-						self.ws.onmessage = self.wsMessage;
-					}
-				}
-			}
+                        self.autoStop = false;
+                        break;
+                }
+            }
 
-			this.updateProgress = function () {
-				self.progressElement.style.width = (self.videoElement.currentTime / self.time * 100) + "%";
-			}
+            this.connectWebsocket = function () {
+                if (self.wsUrl != null && self.wsUrl.length > 0) {
+                    self.ws = new WebSocket(self.wsUrl);
 
-			this.showVideo = function () {
-				if (self.videoSrc == null || self.videoSrc.length == 0) {
-					return;
-				}
+                    self.ws.onopen = function () {
+                        self.ws.onmessage = self.wsMessage;
+                    }
+                }
+            }
 
-				if (!self.videoElement.onplay) {
-					self.videoElement.onplay = function () {
-						if (self.videoElement.duration) {
-							self.time = self.videoElement.duration
-						}
-					}
+            this.updateProgress = function () {
+                self.progressElement.style.width = (self.videoElement.currentTime / self.time * 100) + "%";
+            }
 
-					self.videoElement.ontimeupdate = self.updateProgress;
-				}
+            this.showVideo = function () {
+                if (self.videoSrc == null || self.videoSrc.length == 0) {
+                    return;
+                }
 
-				self.videoElement.src = self.videoSrc;
-			}
+                if (!self.videoElement.onplay) {
+                    self.videoElement.onplay = function () {
+                        if (self.videoElement.duration) {
+                            self.time = self.videoElement.duration
+                        }
+                    }
 
-			this.playVideo = function () {
-				let firstrun = true;
+                    self.videoElement.ontimeupdate = self.updateProgress;
+                }
 
-				// apply mp4 to video element so it's ready to play
+                self.videoElement.src = self.videoSrc;
+            }
 
-				if (self.image != null && self.image.length > 0) {
-					document.getElementById('imagebox2').innerHTML = "<span style='background-image: url(\"" + self.image + "\")' />";
-				} else {
-					document.getElementById('imagebox2').innerHTML = "<h2>" + self.user + "</h2>";
-				}
+            this.playVideo = function () {
+                let firstrun = true;
 
-				setTimeout(self.showVideo, 1000);
-			}
+                // apply mp4 to video element so it's ready to play
 
-			this.cleanup = function () {
-				document.getElementById('videocontainer').innerHTML = "";
-				document.getElementById('imagebox2').innerHTML = "<span style='background-image: url(\"" + self.image + "\")' />";
+                if (self.image != null && self.image.length > 0) {
+                    document.getElementById('imagebox2').innerHTML = "<span style='background-image: url(\"" + self.image + "\")' />";
+                } else {
+                    document.getElementById('imagebox2').innerHTML = "<h2>" + self.user + "</h2>";
+                }
 
-				if (self.ws != null && self.ws.OPEN) {
-					self.ws.send('stopped');
-				}
-			}
+                setTimeout(self.showVideo, 1500);
+            }
 
-			this.onEnded = function () {
-				if (self.autoStop) {
-					setTimeout(self.cleanup, 500);
-				}
-			}
-		};
+            this.cleanup = function () {
+                document.getElementById('videocontainer').innerHTML = "";
+                document.getElementById('imagebox2').innerHTML = "<span style='background-image: url(\"" + self.image + "\")' />";
 
-		const videoVM = new videoViewModel();
+                if (self.ws != null && self.ws.OPEN) {
+                    self.ws.send('stopped');
+                }
+            }
 
-		function onLoad() {
-			videoVM.init(document, window.location.search);
-			videoVM.connectWebsocket();
-			videoVM.playVideo();
-		}
+            this.onEnded = function () {
+                if (self.autoStop) {
+                    setTimeout(self.cleanup, 500);
+                }
+            }
+        };
 
-	</script>
+        const videoVM = new videoViewModel();
+
+        function onLoad() {
+            videoVM.init(document, window.location.search);
+            videoVM.connectWebsocket();
+            videoVM.playVideo();
+        }
+
+    </script>
 
 </head>
 <body onLoad="onLoad()">
 
 <div className="container">
-	<div id="videocontainer" className="videoContainer">
-		<video id="videoplayer" style="width:100%" autoPlay="" onEnded="videoVM.onEnded()"></video>
-		<div id="progress" className="progress"></div>
-	</div>
-	<div id="imagebox2" className="profileImage"><h2>Loading...</h2></div>
+    <div id="videocontainer" className="videoContainer">
+        <video id="videoplayer" style="width:100%" autoPlay="" onEnded="videoVM.onEnded()"></video>
+        <div id="progress" className="progress"></div>
+    </div>
+    <div id="imagebox2" className="profileImage"><h2>Loading...</h2></div>
 </div>
 
 </body>
