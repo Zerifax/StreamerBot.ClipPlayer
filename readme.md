@@ -41,6 +41,13 @@ If you wish to automatically detect twitch clips in messages (and you allow URL'
 
 The command regex I use is: `https://clips.twitch.tv/[^\s]+`
 
+For media controls you will need to either bind these to commands or buttons on your stream deck or equivalent. The actions you can set up are:
+- Play Clip (start the clip)
+- WS Media Back (rewind 5 seconds)
+- WS Media Forward (forward 5 seconds)
+- WS Media Rewind (reset to beginning)
+- WS Media Play/Pause (pause and resume)
+- Stop Clip (will happen automatically at end of clip unless media controls are used)
 
 ## Actions Import
 
