@@ -6,7 +6,7 @@
     {
             public bool Execute()
             {
-                string pattern = @"https://clips.twitch.tv/[^\s]+";
+                var pattern = @"(?:https://clips.twitch.tv/[^\s]+|https://www.twitch.tv/[^/]+/clip/[^\s]+)";
 		    
                 string input = args["rawInput"].ToString();
                 RegexOptions options = RegexOptions.Multiline | RegexOptions.IgnoreCase;

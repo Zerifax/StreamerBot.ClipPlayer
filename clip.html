@@ -74,11 +74,13 @@
             var self = this;
             const skipTime = 5.0;
 
+            this.videoIndex = 0;
+
             this.init = function (sourceDoc, params) {
                 self.ws = null;
-                self.autoStop = true;
 
                 const urlParams = new URLSearchParams(params);
+                let videos = [];
 
                 self.video = urlParams.get('video');
                 self.time = parseFloat(urlParams.get('time'));
@@ -89,10 +91,16 @@
 
                 // multi purpose - we can extract a video url from the thumbnail or play a video directly
                 if (self.thumbnailUrl != null && self.thumbnailUrl.length > 0) {
-                    self.videoSrc = self.thumbnailUrl.replace(/(.*)-preview-.*/, '$1.mp4');
+                    const thumbnails = self.thumbnailUrl.split(",")
+                    for (let i = 0; i < thumbnails.length; i++) {
+                        videos.push(thumbnails[i].replace(/(.*)-preview-.*/, '$1.mp4'));
+                    }
                 } else {
-                    self.videoSrc = self.video;
+                    videos = self.video.split(",");
                 }
+
+                self.videoSrc = videos;
+                self.autoStop = (self.videoSrc.length <= 1);
 
                 self.videoElement = sourceDoc.getElementById('videoplayer');
                 self.progressElement = sourceDoc.getElementById('progress');
@@ -173,21 +181,23 @@
                     self.videoElement.ontimeupdate = self.updateProgress;
                 }
 
-                self.videoElement.src = self.videoSrc;
+                self.videoElement.src = self.videoSrc[self.videoIndex];
             }
 
             this.playVideo = function () {
-                let firstrun = true;
+                let timeout = 1500;
 
                 // apply mp4 to video element so it's ready to play
 
                 if (self.image != null && self.image.length > 0) {
                     document.getElementById('imagebox2').innerHTML = "<span style='background-image: url(\"" + self.image + "\")' />";
-                } else {
+                } else if (self.user != null) {
                     document.getElementById('imagebox2').innerHTML = "<h2>" + self.user + "</h2>";
+                } else {
+                    timeout = 10;
                 }
 
-                setTimeout(self.showVideo, 1500);
+                setTimeout(self.showVideo, timeout);
             }
 
             this.cleanup = function () {
@@ -202,6 +212,9 @@
             this.onEnded = function () {
                 if (self.autoStop) {
                     setTimeout(self.cleanup, 500);
+                } else if (self.videoSrc.length > 1) {
+                    self.videoIndex = (self.videoIndex + 1) % self.videoSrc.length;
+                    self.showVideo();
                 }
             }
         };

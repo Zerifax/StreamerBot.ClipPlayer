@@ -45,8 +45,10 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Actions\BRBAction.cs" />
         <Compile Include="Actions\PlayClipAction.cs" />
         <Compile Include="Actions\SetClipAction.cs" />
+        <Compile Include="Fakes\BRBAction.cs" />
         <Compile Include="Fakes\FakeAction.cs" />
         <Compile Include="Fakes\PlayClipAction.cs" />
         <Compile Include="Fakes\SetClipAction.cs" />

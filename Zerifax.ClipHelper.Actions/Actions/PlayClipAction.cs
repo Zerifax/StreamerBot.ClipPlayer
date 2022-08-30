@@ -29,6 +29,7 @@
             var videoPlayerFile = CPH.GetGlobalVar<string>("ClipFile", true);
 		
             var clip = CPH.GetGlobalVar<string>("lastclip", false);
+            CPH.LogInfo($"Playing clip {clip}");
 
             var slugRegex = new Regex(".*/(?<slug>[^/]+)(?:/?)$");
 
@@ -36,6 +37,7 @@
 
             if (!slugResult.Success)
             {
+                CPH.LogInfo("No Slug");
                 return true;
             }
 		
@@ -43,6 +45,7 @@
 
             if (clipData == null)
             {
+                CPH.LogInfo("No Clip Data");
                 return true;
             }
 
@@ -52,6 +55,7 @@
 
             if (string.IsNullOrWhiteSpace(clipPreview))
             {
+                CPH.LogInfo("No Clip Preview");
                 return true;
             }
 		
@@ -68,7 +72,7 @@
             videoPlayerFile += "&ws=" + webSocket;
 
             CPH.ObsSetBrowserSource(scene, source, videoPlayerFile);
-
+		
             return true;
         }
     }
